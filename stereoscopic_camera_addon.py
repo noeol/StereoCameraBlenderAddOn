@@ -20,7 +20,7 @@
 #  Author: Sebastian Schneider
 #  Web: http://www.noeol.de
 #
-#  Update: Apr/02/2012
+#  Update: Jun/11/2013
 #
 #  tested with:
 #  Blender 2.62.0 r44136 
@@ -34,8 +34,8 @@
 bl_info = {
     'name': "Stereoscopic Camera",
     'author': "Sebastian Schneider <s.schneider@noeol.de>",
-    'version': (1, 6, 7),
-    'blender': (2, 6, 2),
+    'version': (1, 6, 8),
+    'blender': (2, 6, 7),
     'api': 44136,
     'location': "Select a Camera > Properties Panel > Camera Panel > Stereoscopic Camera",
     'description': "Adds an 'Off-Axis', 'Toe-In' or 'Parallel' stereo camera rig",
@@ -755,6 +755,8 @@ class OBJECT_OT_create_left_right_scene(bpy.types.Operator):
         right_scene.camera = bpy.data.objects["R_"+center_cam_name]
         right_scene.background_set = center_scene
         
+        print('test '+right_scene.camera.name)
+		
         # back to the center scene
         context.screen.scene = center_scene
     
@@ -779,7 +781,7 @@ class NODE_EDITOR_PT_preset(bpy.types.Panel):
         scn = bpy.context.scene
         view = context.space_data
 
-        if (view.tree_type == 'COMPOSITING') and (view.id.use_nodes):    
+        if (view.tree_type == 'COMPOSITING' or view.tree_type == 'CompositorNodeTree') and (view.id.use_nodes):    
             layout = self.layout
             col = layout.column()
             row = col.row()
@@ -847,18 +849,18 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 canvas_img = bpy.data.images['canvas'+str(res_x*2)+'x'+str(res_y)]    
 
             # scene render layer (will not be used but has to be in the node tree to handle animations)
-            center_render_layer = tree.nodes.new('R_LAYERS')
+            center_render_layer = tree.nodes.new('CompositorNodeRLayers')
             center_render_layer.location = (-20,450)
 
             # set the camvas image node
-            canvas_node = tree.nodes.new('IMAGE')
+            canvas_node = tree.nodes.new('CompositorNodeImage')
             canvas_node.location = (-800,150)
             canvas_node.image = bpy.data.images['canvas'+str(res_x*2)+'x'+str(res_y)]
             
             # set the left image node
-            #left_view = tree.nodes.new('IMAGE')
+            #left_view = tree.nodes.new('CompositorNodeImage')
             #left_view.location = (-600,270)
-            left_render_layer = tree.nodes.new('R_LAYERS')
+            left_render_layer = tree.nodes.new('CompositorNodeRLayers')
             left_render_layer.location = (-600,270)
             try: 
                 left_render_layer.scene = bpy.data.scenes['Left_Camera']
@@ -866,9 +868,9 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
             
             # set the right image node 
-            #right_view = tree.nodes.new('IMAGE')
+            #right_view = tree.nodes.new('CompositorNodeImage')
             #right_view.location = (-600,0)
-            right_render_layer = tree.nodes.new('R_LAYERS')
+            right_render_layer = tree.nodes.new('CompositorNodeRLayers')
             right_render_layer.location = (-600,0)
             try: 
                 right_render_layer.scene = bpy.data.scenes['Right_Camera']
@@ -876,35 +878,35 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
             
             # shift the left image to the left
-            left_translate = tree.nodes.new('TRANSLATE')
+            left_translate = tree.nodes.new('CompositorNodeTranslate')
             left_translate.location = (-400, 250)
             left_translate.inputs[1].default_value = -(int(res_x/2))
             left_translate.inputs[2].default_value = 0
             
             # shift the right image to the right
-            right_translate = tree.nodes.new('TRANSLATE')
+            right_translate = tree.nodes.new('CompositorNodeTranslate')
             right_translate.location = (-400, -20)
             right_translate.inputs[1].default_value = (int(res_x/2))
             right_translate.inputs[2].default_value = 0
            
             # mix 1
-            mix_1 = tree.nodes.new('MIX_RGB')
+            mix_1 = tree.nodes.new('CompositorNodeMixRGB')
             mix_1.location = (-190,250)
             mix_1.blend_type = 'SCREEN'
             mix_1.inputs[0].default_value = 1.0
             
             # mix 2
-            mix_2 = tree.nodes.new('MIX_RGB')
+            mix_2 = tree.nodes.new('CompositorNodeMixRGB')
             mix_2.location = (-10,100)
             mix_2.blend_type = 'SCREEN'
             mix_2.inputs[0].default_value = 1.0
             
             # file output
-            file_output_node = tree.nodes.new('OUTPUT_FILE')
+            file_output_node = tree.nodes.new('CompositorNodeOutputFile')
             file_output_node.location = (200, 100)
             
             # comp output (not needed)
-            composite_node = tree.nodes.new('COMPOSITE')
+            composite_node = tree.nodes.new('CompositorNodeComposite')
             composite_node.location = (200, 400)
             
             # noodle from left view to left translate
@@ -952,18 +954,18 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 canvas_img = bpy.data.images['canvas'+str(res_x)+'x'+str(res_y)] 
                 
             # scene render layer (will not be used but has to be in the node tree to handle animations)
-            center_render_layer = tree.nodes.new('R_LAYERS')
+            center_render_layer = tree.nodes.new('CompositorNodeRLayers')
             center_render_layer.location = (180,400)   
 
             # set the camvas image node
-            canvas_node = tree.nodes.new('IMAGE')
+            canvas_node = tree.nodes.new('CompositorNodeImage')
             canvas_node.location = (-800,150)
             canvas_node.image = bpy.data.images['canvas'+str(res_x)+'x'+str(res_y)]
             
             # set the left image node
-            #left_view = tree.nodes.new('IMAGE')
+            #left_view = tree.nodes.new('CompositorNodeImage')
             #left_view.location = (-600,270)
-            left_render_layer = tree.nodes.new('R_LAYERS')
+            left_render_layer = tree.nodes.new('CompositorNodeRLayers')
             left_render_layer.location = (-600,270)
             try: 
                 left_render_layer.scene = bpy.data.scenes['Left_Camera']
@@ -971,9 +973,9 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass         
                         
             # set the right image node 
-            #right_view = tree.nodes.new('IMAGE')
+            #right_view = tree.nodes.new('CompositorNodeImage')
             #right_view.location = (-600,0)
-            right_render_layer = tree.nodes.new('R_LAYERS')
+            right_render_layer = tree.nodes.new('CompositorNodeRLayers')
             right_render_layer.location = (-600,0)
             try: 
                 right_render_layer.scene = bpy.data.scenes['Right_Camera']
@@ -981,43 +983,43 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
             
             # scale the left image
-            left_scale = tree.nodes.new('SCALE')
+            left_scale = tree.nodes.new('CompositorNodeScale')
             left_scale.location = (-400, 250)
             left_scale.space = 'RELATIVE'
             left_scale.inputs[1].default_value = 0.5
 
             # scale the right image
-            right_scale = tree.nodes.new('SCALE')
+            right_scale = tree.nodes.new('CompositorNodeScale')
             right_scale.location = (-400, 0)
             right_scale.space = 'RELATIVE'
             right_scale.inputs[1].default_value = 0.5
             
             # shift the left image to the left
-            left_translate = tree.nodes.new('TRANSLATE')
+            left_translate = tree.nodes.new('CompositorNodeTranslate')
             left_translate.location = (-200, 250)
             left_translate.inputs[1].default_value = -(scale_x/2)
             left_translate.inputs[2].default_value = 0
             
             # shift the right image to the right
-            right_translate = tree.nodes.new('TRANSLATE')
+            right_translate = tree.nodes.new('CompositorNodeTranslate')
             right_translate.location = (-200, -20)
             right_translate.inputs[1].default_value = (scale_x/2)
             right_translate.inputs[2].default_value = 0
            
             # mix 1
-            mix_1 = tree.nodes.new('MIX_RGB')
+            mix_1 = tree.nodes.new('CompositorNodeMixRGB')
             mix_1.location = (0,200)
             mix_1.blend_type = 'SCREEN'
             mix_1.inputs[0].default_value = 1.0
             
             # mix 2
-            mix_2 = tree.nodes.new('MIX_RGB')
+            mix_2 = tree.nodes.new('CompositorNodeMixRGB')
             mix_2.location = (180,100)
             mix_2.blend_type = 'SCREEN'
             mix_2.inputs[0].default_value = 1.0
         
             # comp output
-            composite_node = tree.nodes.new('COMPOSITE')
+            composite_node = tree.nodes.new('CompositorNodeComposite')
             composite_node.location = (400, 100)
             
             # noodle from left view to left scale
@@ -1066,18 +1068,18 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 canvas_img = bpy.data.images['canvas'+str(res_x)+'x'+str(res_y*2)]    
 
             # scene render layer (will not be used but has to be in the node tree to handle animations)
-            center_render_layer = tree.nodes.new('R_LAYERS')
+            center_render_layer = tree.nodes.new('CompositorNodeRLayers')
             center_render_layer.location = (-20,450)
 
             # set the camvas image node
-            canvas_node = tree.nodes.new('IMAGE')
+            canvas_node = tree.nodes.new('CompositorNodeImage')
             canvas_node.location = (-800,150)
             canvas_node.image = bpy.data.images['canvas'+str(res_x)+'x'+str(res_y*2)]
             
             # set the left image node
-            #left_view = tree.nodes.new('IMAGE')
+            #left_view = tree.nodes.new('CompositorNodeImage')
             #left_view.location = (-600,270)
-            left_render_layer = tree.nodes.new('R_LAYERS')
+            left_render_layer = tree.nodes.new('CompositorNodeRLayers')
             left_render_layer.location = (-600,270)
             try: 
                 left_render_layer.scene = bpy.data.scenes['Left_Camera']
@@ -1085,9 +1087,9 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
            
             # set the right image node 
-            #right_view = tree.nodes.new('IMAGE')
+            #right_view = tree.nodes.new('CompositorNodeImage')
             #right_view.location = (-600,0)
-            right_render_layer = tree.nodes.new('R_LAYERS')
+            right_render_layer = tree.nodes.new('CompositorNodeRLayers')
             right_render_layer.location = (-600,0)
             try: 
                 right_render_layer.scene = bpy.data.scenes['Right_Camera']
@@ -1095,35 +1097,35 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
             
             # shift the left image to the top
-            left_translate = tree.nodes.new('TRANSLATE')
+            left_translate = tree.nodes.new('CompositorNodeTranslate')
             left_translate.location = (-400, 250)
             left_translate.inputs[1].default_value = 0
             left_translate.inputs[2].default_value = int(res_y/2)
             
             # shift the right image to the bottom
-            right_translate = tree.nodes.new('TRANSLATE')
+            right_translate = tree.nodes.new('CompositorNodeTranslate')
             right_translate.location = (-400, -20)
             right_translate.inputs[1].default_value = 0
             right_translate.inputs[2].default_value = -(int(res_y/2))
            
             # mix 1
-            mix_1 = tree.nodes.new('MIX_RGB')
+            mix_1 = tree.nodes.new('CompositorNodeMixRGB')
             mix_1.location = (-190,250)
             mix_1.blend_type = 'SCREEN'
             mix_1.inputs[0].default_value = 1.0
             
             # mix 2
-            mix_2 = tree.nodes.new('MIX_RGB')
+            mix_2 = tree.nodes.new('CompositorNodeMixRGB')
             mix_2.location = (-10,100)
             mix_2.blend_type = 'SCREEN'
             mix_2.inputs[0].default_value = 1.0
             
             # file output
-            file_output_node = tree.nodes.new('OUTPUT_FILE')
+            file_output_node = tree.nodes.new('CompositorNodeOutputFile')
             file_output_node.location = (200, 100)
             
             # comp output (not needed)
-            composite_node = tree.nodes.new('COMPOSITE')
+            composite_node = tree.nodes.new('CompositorNodeComposite')
             composite_node.location = (200, 400)
             
             # noodle from left view to left translate
@@ -1217,18 +1219,18 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
             # 2. the nodes
             #    
             # scene render layer (will not be used but has to be in the node tree to handle animations)
-            center_render_layer = tree.nodes.new('R_LAYERS')
+            center_render_layer = tree.nodes.new('CompositorNodeRLayers')
             center_render_layer.location = (250,400)   
 
             # set the interlaced alpha mask image node
-            alpha_mask_node = tree.nodes.new('IMAGE')
+            alpha_mask_node = tree.nodes.new('CompositorNodeImage')
             alpha_mask_node.location = (-800,150)
             alpha_mask_node.image = bpy.data.images['interlaced_'+str(res_y)]
             
             # set the left image node
-            #left_view = tree.nodes.new('IMAGE')
+            #left_view = tree.nodes.new('CompositorNodeImage')
             #left_view.location = (-600,270)
-            left_render_layer = tree.nodes.new('R_LAYERS')
+            left_render_layer = tree.nodes.new('CompositorNodeRLayers')
             left_render_layer.location = (-600,370)
             try: 
                 left_render_layer.scene = bpy.data.scenes['Left_Camera']
@@ -1236,9 +1238,9 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
 
             # set the right image node 
-            #right_view = tree.nodes.new('IMAGE')
+            #right_view = tree.nodes.new('CompositorNodeImage')
             #right_view.location = (-600,0)
-            right_render_layer = tree.nodes.new('R_LAYERS')
+            right_render_layer = tree.nodes.new('CompositorNodeRLayers')
             right_render_layer.location = (-600,0)
             try: 
                 right_render_layer.scene = bpy.data.scenes['Right_Camera']
@@ -1246,23 +1248,23 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
 
             # scale the interlaced alpha mask
-            alpha_mask_scale = tree.nodes.new('SCALE')
+            alpha_mask_scale = tree.nodes.new('CompositorNodeScale')
             alpha_mask_scale.location = (-400, 140)
             alpha_mask_scale.space = 'ABSOLUTE'
             alpha_mask_scale.inputs[1].default_value = res_x
             alpha_mask_scale.inputs[2].default_value = res_y
             
             # set alpha for the right view
-            set_alpha_node = tree.nodes.new('SETALPHA')
+            set_alpha_node = tree.nodes.new('CompositorNodeSetAlpha')
             set_alpha_node.location = (-170, 20)
             
             # alpha over node to combine left and right
-            alpha_over_node = tree.nodes.new('ALPHAOVER')
+            alpha_over_node = tree.nodes.new('CompositorNodeAlphaOver')
             alpha_over_node.location = (50, 250)
             alpha_over_node.use_premultiply = True
             
             # comp output
-            composite_node = tree.nodes.new('COMPOSITE')
+            composite_node = tree.nodes.new('CompositorNodeComposite')
             composite_node.location = (300, 100)
        
             # noodle from interlaced alpha mask to scale node
@@ -1289,13 +1291,13 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
         if(scene.stereo_comp_presets == "REDCYAN"):
             
             # scene render layer (will not be used but has to be in the node tree to handle animations)
-            center_render_layer = tree.nodes.new('R_LAYERS')
+            center_render_layer = tree.nodes.new('CompositorNodeRLayers')
             center_render_layer.location = (-900,120)
             
             # set the left image node
-            #left_view = tree.nodes.new('IMAGE')
+            #left_view = tree.nodes.new('CompositorNodeImage')
             #left_view.location = (-600,270)
-            left_render_layer = tree.nodes.new('R_LAYERS')
+            left_render_layer = tree.nodes.new('CompositorNodeRLayers')
             left_render_layer.location = (-600,270)
             try: 
                 left_render_layer.scene = bpy.data.scenes['Left_Camera']
@@ -1303,9 +1305,9 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
             
             # set the right image node 
-            #right_view = tree.nodes.new('IMAGE')
+            #right_view = tree.nodes.new('CompositorNodeImage')
             #right_view.location = (-600,0)
-            right_render_layer = tree.nodes.new('R_LAYERS')
+            right_render_layer = tree.nodes.new('CompositorNodeRLayers')
             right_render_layer.location = (-600,0)
             try: 
                 right_render_layer.scene = bpy.data.scenes['Right_Camera']
@@ -1313,19 +1315,19 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass
             
             # seperate red from the left image
-            left_seperate = tree.nodes.new('SEPRGBA')
+            left_seperate = tree.nodes.new('CompositorNodeSepRGBA')
             left_seperate.location = (-400,250)
            
             # seperate green and blue from the right image
-            right_seperate = tree.nodes.new('SEPRGBA')
+            right_seperate = tree.nodes.new('CompositorNodeSepRGBA')
             right_seperate.location = (-400,-20)
             
             # combine red and cyan
-            combine_node = tree.nodes.new('COMBRGBA')
+            combine_node = tree.nodes.new('CompositorNodeCombRGBA')
             combine_node.location = (-150, 100)
             
             # comp output
-            composite_node = tree.nodes.new('COMPOSITE')
+            composite_node = tree.nodes.new('CompositorNodeComposite')
             composite_node.location = (0, 100)
             
             # noodle from left view to seperate red
@@ -1352,13 +1354,13 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
         if(scene.stereo_comp_presets == "AMBERBLUE"):
             
             # scene render layer (will not be used but has to be in the node tree to handle animations)
-            center_render_layer = tree.nodes.new('R_LAYERS')
+            center_render_layer = tree.nodes.new('CompositorNodeRLayers')
             center_render_layer.location = (-900,120)
             
             # set the left image node
-            #left_view = tree.nodes.new('IMAGE')
+            #left_view = tree.nodes.new('CompositorNodeImage')
             #left_view.location = (-600,270)
-            left_render_layer = tree.nodes.new('R_LAYERS')
+            left_render_layer = tree.nodes.new('CompositorNodeRLayers')
             left_render_layer.location = (-600,270)
             try: 
                 left_render_layer.scene = bpy.data.scenes['Left_Camera']
@@ -1366,9 +1368,9 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass            
             
             # set the right image node 
-            #right_view = tree.nodes.new('IMAGE')
+            #right_view = tree.nodes.new('CompositorNodeImage')
             #right_view.location = (-600,0)  
-            right_render_layer = tree.nodes.new('R_LAYERS')
+            right_render_layer = tree.nodes.new('CompositorNodeRLayers')
             right_render_layer.location = (-600,0) 
             try: 
                 right_render_layer.scene = bpy.data.scenes['Right_Camera']
@@ -1376,20 +1378,20 @@ class OBJECT_OT_add_stereo_node_preset(bpy.types.Operator):
                 pass         
 
             # seperate red and green from the left image
-            left_seperate = tree.nodes.new('SEPRGBA')
+            left_seperate = tree.nodes.new('CompositorNodeSepRGBA')
             left_seperate.location = (-400,250)
             
             # de-saturation of the right image
-            saturation_node = tree.nodes.new('HUE_SAT')
+            saturation_node = tree.nodes.new('CompositorNodeHueSat')
             saturation_node.location = (-400,-20)
             saturation_node.color_saturation = 0.0
             
             # combine yellow and blue
-            combine_node = tree.nodes.new('COMBRGBA')
+            combine_node = tree.nodes.new('CompositorNodeCombRGBA')
             combine_node.location = (-150, 100)  
             
             # comp output
-            composite_node = tree.nodes.new('COMPOSITE')
+            composite_node = tree.nodes.new('CompositorNodeComposite')
             composite_node.location = (0, 100)          
 
             # noodle from left view to seperate red
