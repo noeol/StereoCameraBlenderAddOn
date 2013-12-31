@@ -1,8 +1,9 @@
 Stereoscopic Rendering in Blender 2.6
 =================
 Addon version 1.6.8, by Sebastian Schneider.
-
 Manual copied from (http://www.noeol.de/s3d/)
+
+For a further implementation of a multi-view camera in Blender, I recommend the work of Dalai Felinto  [https://github.com/dfelinto/multiview_addon](https://github.com/dfelinto/multiview_addon)
 
 Introduction
 ============
@@ -37,7 +38,7 @@ The Add-on provides all three stereoscopic camera types. The 'Off-Axis' rig is s
 Mathematics
 ===========
 
-For those who are interested in off-axis calculation and how to build the [stereo comfort zone](http://www.noeol.de/s3d/near-far-plane.png)], here are some formulas.
+For those who are interested in off-axis calculation and how to build the [stereo comfort zone](http://www.noeol.de/s3d/near-far-plane.png), here are some formulas.
 
 1) Calculating off-axis shift (delta) in pixel:
 
