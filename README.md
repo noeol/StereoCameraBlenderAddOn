@@ -27,7 +27,7 @@ The Add-on provides all three stereoscopic camera types. The 'Off-Axis' rig is s
 ![](http://www.noeol.de/s3d/toein_rig.png) 
 ![](http://www.noeol.de/s3d/parallel_rig.png)
 
-Note: to re-calculate the shift of the Off-Axis Camera, click the 'Set Stereo Camera' button
+**Note**: to re-calculate the shift of the Off-Axis Camera, click the 'Set Stereo Camera' button
  1. if you change the render resolution
  2. if you change the camera angle
  3. if you change any stereo parameter
