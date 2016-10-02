@@ -1,9 +1,8 @@
 Stereoscopic Rendering in Blender 2.6
 =================
 Addon version 1.6.8, by Sebastian Schneider.
-Manual copied from (http://www.noeol.de/s3d/)
 
-For a further implementation of a multi-view camera in Blender, I recommend the work of Dalai Felinto  [https://github.com/dfelinto/multiview_addon](https://github.com/dfelinto/multiview_addon)
+**Since Blender version 2.75, a Stereo (Multiview) Camera is already part of Blender, so this script (Add-On) is obsolete. For further information see: [https://www.blender.org/manual/render/workflows/multiview/usage.html](https://www.blender.org/manual/render/workflows/multiview/usage.html)**
 
 Introduction
 ============
@@ -13,11 +12,6 @@ Since there is no stereoscopic camera in Blender, I decided to write a python sc
 
 ![](http://www.noeol.de/s3d/gui.png)
 ![](http://www.noeol.de/s3d/frustum.png)
-
-Videos
-======
-* [Video tutorial](http://www.youtube.com/watch?v=HFhKxocDqnA) (youtube.com)
-* [How to render a stereo Side-by-Side animation](http://www.youtube.com/watch?v=usWXat4pt1M) (youtube.com)
 
 Camera Types
 ============
