@@ -2,7 +2,9 @@ Stereoscopic Rendering in Blender 2.6 (< 2.75)
 =================
 Addon version 1.6.8, by Sebastian Schneider.
 
-`**Since Blender version 2.75, a Stereo (Multiview) Camera is already part of Blender, so this script (Add-On) is obsolete. For further information see: [https://www.blender.org/manual/render/workflows/multiview/usage.html](https://www.blender.org/manual/render/workflows/multiview/usage.html)**`
+Important
+=========
+**Since Blender version 2.75, a Stereo (Multiview) Camera is already part of Blender, so this script (Add-On) is obsolete. For further information see: [https://www.blender.org/manual/render/workflows/multiview/usage.html](https://www.blender.org/manual/render/workflows/multiview/usage.html)**
 
 Introduction
 ============
